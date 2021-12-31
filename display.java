@@ -9,16 +9,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class display extends Canvas implements Runnable, KeyListener{
 
+    int OFFSET =0;
     int xrotation = 0;
     int yrotation = 0;
     int zrotation = 0;
     boolean Cw = true;
+    boolean help = false;
+    boolean randomColors = false;
     private static final long serialVersionUID=1L;
     boolean running = false;
     Thread thread;
@@ -35,9 +42,12 @@ public class display extends Canvas implements Runnable, KeyListener{
     Polygon3D triangle8;
     ArrayList<Polygon3D> happyPolygon3ds;
 
-    public display(App f){
-        setPreferredSize(new Dimension(420,420));
+    public display(App f, int offset){
+        OFFSET=offset;
+        //setPreferredSize(new Dimension(420,420));
+        setSize(new Dimension(420,420));
         jframe=f;
+        setBackground(Color.white);
     }
 
     public synchronized void start(){
@@ -45,15 +55,6 @@ public class display extends Canvas implements Runnable, KeyListener{
         thread=new Thread(this, "display");
         thread.start();
         init();
-    }
-
-    public synchronized void stop(){
-        running=false;
-        try {
-            thread.join();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
     }
 
     private void render() {
@@ -70,7 +71,7 @@ public class display extends Canvas implements Runnable, KeyListener{
         g.setStroke(new BasicStroke(5));
         clearCanvas(g);        
 
-        List<Polygon3D> happySortedList = happyPolygon3ds.stream()
+        List<Polygon3D> happySortedList = happyPolygon3ds.stream()  //damn all those java streams tutorials coming in clutch
             .sorted(Comparator.comparingDouble(Polygon3D::getAverageX))
             .collect(Collectors.toList());
 
@@ -86,7 +87,7 @@ public class display extends Canvas implements Runnable, KeyListener{
 
     private void clearCanvas(Graphics g){
         g.setColor(Color.white);
-        g.fillRect(0, 0, 500, 500);
+        g.fillRect(0, 0, 500, 459);
     }
 
     private void update() {
@@ -94,14 +95,14 @@ public class display extends Canvas implements Runnable, KeyListener{
 
     private void init(){
 
-        Point3D[] happyTriangle = {new Point3D(35, 0, 0),new Point3D(0, 35, 0), new Point3D(0, 0, 35)};
-        Point3D[] happyTriangle2 = {new Point3D(35, 0, 0),new Point3D(0, -35, 0), new Point3D(0, 0, 35)};
-        Point3D[] happyTriangle3 = {new Point3D(-35, 0, 0),new Point3D(0, 35, 0), new Point3D(0, 0, 35)};
-        Point3D[] happyTriangle4 = {new Point3D(-35, 0, 0),new Point3D(0, -35, 0), new Point3D(0, 0, 35)};
-        Point3D[] happyTriangle5 = {new Point3D(35, 0, 0),new Point3D(0, 35, 0), new Point3D(0, 0, -35)};
-        Point3D[] happyTriangle6 = {new Point3D(35, 0, 0),new Point3D(0, -35, 0), new Point3D(0, 0, -35)};
-        Point3D[] happyTriangle7 = {new Point3D(-35, 0, 0),new Point3D(0, 35, 0), new Point3D(0, 0, -35)};
-        Point3D[] happyTriangle8 = {new Point3D(-35, 0, 0),new Point3D(0, -35, 0), new Point3D(0, 0, -35)};
+        Point3D[] happyTriangle = {new Point3D(35  +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, 35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, 35 +OFFSET)};
+        Point3D[] happyTriangle2 = {new Point3D(35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, -35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, 35 +OFFSET)};
+        Point3D[] happyTriangle3 = {new Point3D(-35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, 35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, 35 +OFFSET)};
+        Point3D[] happyTriangle4 = {new Point3D(-35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, -35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, 35 +OFFSET)};
+        Point3D[] happyTriangle5 = {new Point3D(35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, 35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, -35 +OFFSET)};
+        Point3D[] happyTriangle6 = {new Point3D(35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, -35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, -35 +OFFSET)};
+        Point3D[] happyTriangle7 = {new Point3D(-35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, 35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, -35 +OFFSET)};
+        Point3D[] happyTriangle8 = {new Point3D(-35 +OFFSET, 0 +OFFSET, 0 +OFFSET),new Point3D(0 +OFFSET, -35 +OFFSET, 0 +OFFSET), new Point3D(0 +OFFSET, 0 +OFFSET, -35 +OFFSET)};
         
         happyPolygon3ds = new ArrayList<>(Arrays.asList(
             triangle1 = new Polygon3D(Point3D.toPointArray('x', happyTriangle), Point3D.toPointArray('y', happyTriangle), happyTriangle.length, happyTriangle, Color.cyan),
@@ -143,21 +144,51 @@ public class display extends Canvas implements Runnable, KeyListener{
         }
     }
 
+    private void stopRotation() {
+
+        final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(()-> {
+            if (xrotation==0 && yrotation==0 && zrotation==0) executorService.shutdown();
+            else if (xrotation>0) xrotation--;
+            else if (xrotation<0) xrotation++;
+            else if (yrotation>0) yrotation--;
+            else if (yrotation<0) yrotation++;
+            else if (zrotation>0) zrotation--;
+            else if (zrotation<0) zrotation++;
+        }, 0, 100, TimeUnit.MILLISECONDS);       
+    }
+
+    private void randomizeColorsForefer() {
+        final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(()-> {
+            if(randomColors) happyPolygon3ds.forEach(Polygon3D::randomColor);
+            else executorService.shutdown();
+        }, 0, 250, TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {}
 
     @Override
-    public void keyPressed(KeyEvent e) {
-        
-        if(e.getKeyChar()=='q') xrotation++;
-        else if(e.getKeyChar()=='w') yrotation++;
-        else if(e.getKeyChar()=='e') zrotation++;
-        else if(e.getKeyChar()=='a') xrotation--;
-        else if(e.getKeyChar()=='s') yrotation--;
-        else if(e.getKeyChar()=='d') zrotation--;
-        else if(e.getKeyChar()=='c') Cw=!Cw;
+    public void keyPressed(KeyEvent e) {        //some of those commands must not be spammable, so i moved them in keyReleased
+
+        if(e.getKeyChar()=='q' && xrotation+yrotation+zrotation<20) xrotation++;
+        else if(e.getKeyChar()=='w'&& xrotation+yrotation+zrotation<20) yrotation++;
+        else if(e.getKeyChar()=='e'&& xrotation+yrotation+zrotation<20) zrotation++;
+        else if(e.getKeyChar()=='a'&& xrotation+yrotation+zrotation>-20) xrotation--;
+        else if(e.getKeyChar()=='s'&& xrotation+yrotation+zrotation>-20) yrotation--;
+        else if(e.getKeyChar()=='d'&& xrotation+yrotation+zrotation>-20) zrotation--;
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {       
+        if(e.getKeyChar()=='c') Cw=!Cw;
+        else if(e.getKeyChar()=='r') {
+            stopRotation();
+        }
+        else if(e.getKeyChar()=='t') happyPolygon3ds.forEach(Polygon3D::resetColor);
+        else if(e.getKeyChar()=='f') happyPolygon3ds.forEach(Polygon3D::randomColor);
+        else if(e.getKeyChar()=='g') {randomColors=!randomColors; randomizeColorsForefer();}
+        else if(e.getKeyChar()=='h') {help=!help; jframe.setSize(jframe.getWidth(), (help?576:469)); }
+    }
 }

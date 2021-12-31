@@ -1,11 +1,14 @@
 import java.awt.Polygon;
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Random;
 
 public class Polygon3D extends Polygon{
     
     Point3D[] points;
+    Color defaultColor;
     Color color;
+    Random rand = new Random();
 
     public Polygon3D(int xpoints[], int ypoints[], int npoints, Point3D[] points, Color c) {
 
@@ -20,6 +23,7 @@ public class Polygon3D extends Polygon{
         this.npoints = npoints;
         this.xpoints = Arrays.copyOf(xpoints, npoints);
         this.ypoints = Arrays.copyOf(ypoints, npoints);
+        defaultColor=c;
         color=c;
     }
 
@@ -40,6 +44,15 @@ public class Polygon3D extends Polygon{
             ax+=p.x;
         }
         return ax;
+    }
+
+    public void resetColor(){
+        color = defaultColor;
+    }
+
+    public void randomColor(){
+
+        color = new Color(rand.nextInt(180)+70,rand.nextInt(180)+70,rand.nextInt(180)+70);
     }
 
     public void rotateAndShrink(boolean CW, double degx){ //, double degy, double degz){
